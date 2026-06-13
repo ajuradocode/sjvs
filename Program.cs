@@ -174,6 +174,7 @@ class Program
         );
 
         Console.WriteLine("JAVA_HOME updated to: " + selected.Path);
+        Console.WriteLine("You must refresh the terminal to apply the changes.");
     }
 
     static void ShowCurrent()

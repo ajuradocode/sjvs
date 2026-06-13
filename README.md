@@ -10,7 +10,7 @@ sjvs es una herramienta CLI ligera para gestionar y cambiar versiones de JDK en 
 - No modifica PATH
 - Soporte para `latest` (última versión)
 - Configuración persistente del directorio de JDKs
-- Funciona sin modificar PATH
+- Funciona sin modificar PATH. Se da por hecho que ya se encuentra añadida la entrada %JAVA_HOME%\bin
 - Herramienta portable (solo un .exe + config)
 
 ## Instalación
