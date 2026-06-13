@@ -10,6 +10,7 @@ sjvs es una herramienta CLI ligera para gestionar y cambiar versiones de JDK en 
 - Configuración persistente del directorio de JDKs
 - Funciona sin modificar PATH
 - Herramienta portable (solo un .exe + config)
+
 ## Estructura recomendada
 
 ```
@@ -20,85 +21,29 @@ jdks/
    jdk-21.0.2
    jdk-23.0.2
 ```
-## Instalación y compilación
 
-### 1. Requisitos
-
-.NET SDK 6+ (recomendado .NET 10)
-
-Verificar:
-
-```bash
-dotnet --version
-```
-
-### 2. Publicar en Release
-
-```bash
-dotnet publish -c Release
-```
-
-## Comandos disponibles
-
-### Configurar directorio de JDKs
-
-```bash
-sjvs dir <path>
-```
-
-Define dónde están instalados los JDKs.
-
-**Ejemplo:**
-
-```bash
-sjvs dir D:\Java\jdks
-```
-### Listar JDKs disponibles
-
-```bash
-sjvs list
-```
-
-Muestra todas las carpetas dentro del directorio configurado.
-
-**Ejemplo:**
+## Uso
 
 ```
-JDKs disponibles:
- - jdk-17
- - jdk-21.0.2
- - jdk-23.0.2
+NAME:
+   sjvs - Simple Java Version Switcher
+
+USAGE:
+   sjvs.exe [global options] command [command options] [arguments...]
+
+VERSION:
+   0.1.0
+
+COMMANDS:
+     dir             Configure the JDK directory
+     list            List available JDK installations
+     use             Switch to use the specified version.
+     current         Show the current JAVA_HOME
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
-### Activar una versión
-
-```bash
-sjvs use <version>
-```
-
-Cambia JAVA_HOME al JDK indicado.
-
-**Ejemplo:**
-
-```bash
-sjvs use jdk-21.0.2
-```
-### Usar la última versión
-
-```bash
-sjvs use latest
-```
-
-Selecciona automáticamente el JDK con la versión más alta.
-
-### Ver JAVA_HOME actual
-
-```bash
-sjvs current
-```
-
-Muestra el valor actual de JAVA_HOME del usuario.
-
-### Comportamiento de matching
 
 El comando `use` soporta:
 
@@ -120,16 +65,8 @@ sjvs use jdk-23
 ```bash
 sjvs use latest
 ```
-### Configuración interna
 
-El directorio de JDKs se guarda en `sjvs.config`
-
-**Contenido:**
-
-```
-D:\Java\jdks
-```
-## Ejemplo completo de uso
+### Ejemplo de uso completo
 
 ```bash
 sjvs dir D:\Java\jdks
@@ -138,14 +75,14 @@ sjvs use jdk-23.0.2
 sjvs current
 sjvs use latest
 ```
+
 ## Notas
 
 - Solo modifica JAVA_HOME del usuario (no requiere admin)
 - No modifica PATH
-- Requiere reiniciar terminales para reflejar cambios en nuevos procesos
 - Diseñado para ser portable
 
-## Futuras mejoras posibles
+## 🔧 Futuras mejoras posibles
 
 - `sjvs reset` (borrar configuración)
 - `sjvs where` (mostrar config actual)
