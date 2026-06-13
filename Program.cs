@@ -26,12 +26,7 @@ class Program
                 break;
 
             case "use":
-                if (args.Length < 2)
-                {
-                    Console.WriteLine("Uso: sjvs use <version|latest>");
-                    return;
-                }
-                WithJdks(configFile, jdks => UseJdk(jdks, args[1]));
+                WithJdks(configFile, jdks => UseJdk(jdks, args));
                 break;
 
             case "current":
@@ -44,13 +39,13 @@ class Program
         }
     }
 
-    // ---------------- CONFIG ----------------
+    // ================ CONFIG ================
 
     static void SetDir(string[] args, string configFile)
     {
         if (args.Length < 2)
         {
-            Console.WriteLine("Uso: sjvs dir <path>");
+            Console.WriteLine("Usage: sjvs dir <path>");
             return;
         }
 
@@ -58,14 +53,13 @@ class Program
 
         if (!Directory.Exists(path))
         {
-            Console.WriteLine("El directorio no existe.");
+            Console.WriteLine("Directory does not exist.");
             return;
         }
 
         File.WriteAllText(configFile, path);
 
-        Console.WriteLine("Directorio configurado:");
-        Console.WriteLine(path);
+        Console.WriteLine("JDKs directory configured: " + path);
     }
 
     static string? GetDir(string configFile)
@@ -82,7 +76,7 @@ class Program
 
         if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir))
         {
-            Console.WriteLine("Config inválida. Usa: sjvs dir <path>");
+            Console.WriteLine("Invalid configured JDKs directory. Use: sjvs dir <path>");
             return;
         }
 
@@ -91,26 +85,33 @@ class Program
         action(jdks);
     }
 
-    // ---------------- COMMANDS ----------------
+    // ================ COMMANDS ================
 
     static void ListJdks(Jdk[] jdks)
     {
         if (jdks.Length == 0)
         {
-            Console.WriteLine("No hay JDKs.");
+            Console.WriteLine("No JDKs found.");
             return;
         }
 
-        Console.WriteLine("JDKs disponibles:");
         foreach (var j in jdks.OrderByDescending(x => x.Version))
             Console.WriteLine($" - {j.Name}");
     }
 
-    static void UseJdk(Jdk[] jdks, string input)
+    static void UseJdk(Jdk[] jdks, string[] args)
     {
+        if (args.Length < 2)
+        {
+            Console.WriteLine("Usage: sjvs use <version>");
+            return;
+        }
+
+        string input = args[1];
+
         if (jdks.Length == 0)
         {
-            Console.WriteLine("No hay JDKs.");
+            Console.WriteLine("No JDKs found.");
             return;
         }
 
@@ -131,9 +132,15 @@ class Program
 
         if (selected == null)
         {
-            Console.WriteLine("No se encontró la versión.");
+            Console.WriteLine("Version not found.");
             return;
         }
+
+        Environment.SetEnvironmentVariable(
+            "JAVA_HOME",
+            selected.Path,
+            EnvironmentVariableTarget.Process
+        );
 
         Environment.SetEnvironmentVariable(
             "JAVA_HOME",
@@ -141,29 +148,26 @@ class Program
             EnvironmentVariableTarget.User
         );
 
-        Console.WriteLine("JAVA_HOME actualizado a:");
-        Console.WriteLine(selected.Path);
+        Console.WriteLine("JAVA_HOME updated to: " + selected.Path);
     }
 
     static void ShowCurrent()
     {
         var value = Environment.GetEnvironmentVariable("JAVA_HOME", EnvironmentVariableTarget.User);
 
-        Console.WriteLine(string.IsNullOrWhiteSpace(value)
-            ? "JAVA_HOME no definido"
-            : $"JAVA_HOME actual:\n{value}");
+        Console.WriteLine(value);
     }
 
     static void PrintHelp()
     {
-        Console.WriteLine("Uso:");
+        Console.WriteLine("Usage:");
         Console.WriteLine("  sjvs dir <path>");
         Console.WriteLine("  sjvs list");
-        Console.WriteLine("  sjvs use <version|latest>");
+        Console.WriteLine("  sjvs use <version> (can use 'latest')");
         Console.WriteLine("  sjvs current");
     }
 
-    // ---------------- CORE ----------------
+    // ================ CORE ================
 
     static Jdk[] LoadJdks(string dir)
     {
