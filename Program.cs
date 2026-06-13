@@ -191,7 +191,6 @@ class Program
         Console.WriteLine("USAGE:");
         Console.WriteLine("   sjvs.exe [global options] command [command options] [arguments...]");
         Console.WriteLine();
-        Console.WriteLine();
         Console.WriteLine("GLOBAL OPTIONS:");
         Console.WriteLine("   --help, -h     Show help");
         Console.WriteLine("   --version, -v  Print the version");
