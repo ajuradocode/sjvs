@@ -6,33 +6,25 @@ sjvs es una herramienta CLI ligera para gestionar y cambiar versiones de JDK en 
 
 - Gestión de múltiples JDKs desde un directorio central
 - Cambio de JAVA_HOME por versión
+- Solo modifica JAVA_HOME del usuario (no requiere admin)
+- No modifica PATH
 - Soporte para `latest` (última versión)
 - Configuración persistente del directorio de JDKs
 - Funciona sin modificar PATH
 - Herramienta portable (solo un .exe + config)
 
-## Estructura recomendada
+## Instalación
 
-```
-sjvs.exe
-sjvs.config (se crea automáticamente)
-jdks/
-   jdk-17
-   jdk-21.0.2
-   jdk-23.0.2
-```
+Descargamos la última release y la ubicamos en una ubicación de nuestra conveniencia (p.e. C:\Tools\sjvs)
 
 ## Uso
 
 ```
 NAME:
-   sjvs - Simple Java Version Switcher
+   sjvs - Simple Java Version Switcher for Windows
 
 USAGE:
    sjvs.exe [global options] command [command options] [arguments...]
-
-VERSION:
-   0.1.0
 
 COMMANDS:
      dir             Configure the JDK directory
@@ -41,8 +33,8 @@ COMMANDS:
      current         Show the current JAVA_HOME
 
 GLOBAL OPTIONS:
-   --help, -h     show help
-   --version, -v  print the version
+   --help, -h        Show help
+   --version, -v     Print the current sjvs version
 ```
 
 El comando `use` soporta:
@@ -75,12 +67,6 @@ sjvs use jdk-23.0.2
 sjvs current
 sjvs use latest
 ```
-
-## Notas
-
-- Solo modifica JAVA_HOME del usuario (no requiere admin)
-- No modifica PATH
-- Diseñado para ser portable
 
 ## 🔧 Futuras mejoras posibles
 

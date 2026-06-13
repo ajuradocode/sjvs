@@ -1,7 +1,13 @@
 ﻿using System.Text.RegularExpressions;
+using System.Reflection;
 
 class Program
 {
+    private static string GetVersion() =>
+        typeof(Program).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion ?? "unknown";
+
     static void Main(string[] args)
     {
         string exeDir = AppContext.BaseDirectory;
@@ -13,6 +19,25 @@ class Program
             return;
         }
 
+        // Handle global options
+        if (args.Length > 0)
+        {
+            if (args[0].Equals("--version", StringComparison.OrdinalIgnoreCase) ||
+                args[0].Equals("-v", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"{GetVersion()}");
+                return;
+            }
+
+            if (args[0].Equals("--help", StringComparison.OrdinalIgnoreCase) ||
+                args[0].Equals("-h", StringComparison.OrdinalIgnoreCase))
+            {
+                PrintHelp();
+                return;
+            }
+        }
+
+        // Handle commands
         string command = args[0].ToLowerInvariant();
 
         switch (command)
@@ -160,11 +185,23 @@ class Program
 
     static void PrintHelp()
     {
-        Console.WriteLine("Usage:");
-        Console.WriteLine("  sjvs dir <path>");
-        Console.WriteLine("  sjvs list");
-        Console.WriteLine("  sjvs use <version> (can use 'latest')");
-        Console.WriteLine("  sjvs current");
+        Console.WriteLine("NAME:");
+        Console.WriteLine($"   sjvs - JDK Version Manager for Windows - {GetVersion()}");
+        Console.WriteLine();
+        Console.WriteLine("USAGE:");
+        Console.WriteLine("   sjvs.exe [global options] command [command options] [arguments...]");
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("COMMANDS:");
+        Console.WriteLine("     dir              Configure the JDK directory");
+        Console.WriteLine("     list             List available JDK installations");
+        Console.WriteLine("     use              Switch to use the specified version");
+        Console.WriteLine("     current          Show the current JAVA_HOME");
+        Console.WriteLine("     help, h          Shows a list of commands or help for one command");
+        Console.WriteLine();
+        Console.WriteLine("GLOBAL OPTIONS:");
+        Console.WriteLine("   --help, -h     show help");
+        Console.WriteLine("   --version, -v  print the version");
     }
 
     // ================ CORE ================
