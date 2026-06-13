@@ -24,39 +24,19 @@ jdks/
 
 ### 1. Requisitos
 
-.NET SDK 6+ (recomendado .NET 8)
+.NET SDK 6+ (recomendado .NET 10)
 
 Verificar:
 
 ```bash
 dotnet --version
 ```
-### 2. Crear proyecto
+
+### 2. Publicar en Release
 
 ```bash
-dotnet new console -n sjvs
-cd sjvs
+dotnet publish -c Release
 ```
-
-### 3. Reemplazar código
-
-Sustituye el contenido de `Program.cs` por el código de la herramienta.
-
-### 4. Compilar en Release
-
-```bash
-dotnet build -c Release
-```
-
-### 5. Ejecutable final
-
-El .exe se encuentra en:
-
-```
-bin\Release\net10.0\sjvs.exe
-```
-
-Puedes copiarlo a cualquier carpeta junto con tu directorio de JDKs.
 
 ## Comandos disponibles
 

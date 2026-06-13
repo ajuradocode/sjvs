@@ -1,14 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 class Program
 {
     static void Main(string[] args)
     {
-        string exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        string exeDir = AppContext.BaseDirectory;
         string configFile = Path.Combine(exeDir, "sjvs.config");
 
         if (args.Length == 0)
@@ -22,11 +18,11 @@ class Program
         switch (command)
         {
             case "dir":
-                SetDirectory(args, configFile);
+                SetDir(args, configFile);
                 break;
 
             case "list":
-                WithJdkDir(configFile, ListJdks);
+                WithJdks(configFile, ListJdks);
                 break;
 
             case "use":
@@ -35,8 +31,7 @@ class Program
                     Console.WriteLine("Uso: sjvs use <version|latest>");
                     return;
                 }
-
-                WithJdkDir(configFile, dir => UseJdk(dir, args[1]));
+                WithJdks(configFile, jdks => UseJdk(jdks, args[1]));
                 break;
 
             case "current":
@@ -51,7 +46,7 @@ class Program
 
     // ---------------- CONFIG ----------------
 
-    static void SetDirectory(string[] args, string configFile)
+    static void SetDir(string[] args, string configFile)
     {
         if (args.Length < 2)
         {
@@ -69,11 +64,11 @@ class Program
 
         File.WriteAllText(configFile, path);
 
-        Console.WriteLine("Directorio de JDKs configurado en:");
+        Console.WriteLine("Directorio configurado:");
         Console.WriteLine(path);
     }
 
-    static string? GetConfiguredDir(string configFile)
+    static string? GetDir(string configFile)
     {
         if (!File.Exists(configFile))
             return null;
@@ -81,68 +76,57 @@ class Program
         return File.ReadAllText(configFile).Trim();
     }
 
-    static void WithJdkDir(string configFile, Action<string> action)
+    static void WithJdks(string configFile, Action<Jdk[]> action)
     {
-        var dir = GetConfiguredDir(configFile);
+        var dir = GetDir(configFile);
 
-        if (string.IsNullOrWhiteSpace(dir))
+        if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir))
         {
-            Console.WriteLine("No hay directorio configurado.");
-            Console.WriteLine("Usa: sjvs dir <path>");
+            Console.WriteLine("Config inválida. Usa: sjvs dir <path>");
             return;
         }
 
-        if (!Directory.Exists(dir))
-        {
-            Console.WriteLine($"El directorio configurado no existe: {dir}");
-            return;
-        }
+        var jdks = LoadJdks(dir);
 
-        action(dir);
+        action(jdks);
     }
 
     // ---------------- COMMANDS ----------------
 
-    static void ListJdks(string sourceDir)
+    static void ListJdks(Jdk[] jdks)
     {
-        var jdks = GetJdks(sourceDir);
-
         if (jdks.Length == 0)
         {
-            Console.WriteLine("No hay JDKs disponibles.");
+            Console.WriteLine("No hay JDKs.");
             return;
         }
 
         Console.WriteLine("JDKs disponibles:");
-        foreach (var j in jdks)
-            Console.WriteLine(" - " + j.Name);
+        foreach (var j in jdks.OrderByDescending(x => x.Version))
+            Console.WriteLine($" - {j.Name}");
     }
 
-    static void UseJdk(string sourceDir, string input)
+    static void UseJdk(Jdk[] jdks, string input)
     {
-        var jdks = GetJdks(sourceDir);
-
         if (jdks.Length == 0)
         {
-            Console.WriteLine("No hay JDKs disponibles.");
+            Console.WriteLine("No hay JDKs.");
             return;
         }
 
-        string? selected;
+        Jdk? selected = null;
 
         if (input.Equals("latest", StringComparison.OrdinalIgnoreCase))
         {
-            selected = jdks
-                .OrderByDescending(j => j.Version)
-                .First().Path;
+            selected = jdks.OrderByDescending(j => j.Version).First();
         }
         else
         {
-            selected = jdks
-                .FirstOrDefault(j =>
-                    j.Name.Equals(input, StringComparison.OrdinalIgnoreCase) ||
-                    j.Name.Contains(input, StringComparison.OrdinalIgnoreCase)
-                )?.Path;
+            selected =
+                jdks.FirstOrDefault(j =>
+                    j.Name.Equals(input, StringComparison.OrdinalIgnoreCase)) ??
+                jdks.FirstOrDefault(j =>
+                    j.Name.Contains(input, StringComparison.OrdinalIgnoreCase));
         }
 
         if (selected == null)
@@ -153,12 +137,12 @@ class Program
 
         Environment.SetEnvironmentVariable(
             "JAVA_HOME",
-            selected,
+            selected.Path,
             EnvironmentVariableTarget.User
         );
 
         Console.WriteLine("JAVA_HOME actualizado a:");
-        Console.WriteLine(selected);
+        Console.WriteLine(selected.Path);
     }
 
     static void ShowCurrent()
@@ -166,7 +150,7 @@ class Program
         var value = Environment.GetEnvironmentVariable("JAVA_HOME", EnvironmentVariableTarget.User);
 
         Console.WriteLine(string.IsNullOrWhiteSpace(value)
-            ? "JAVA_HOME no está definido."
+            ? "JAVA_HOME no definido"
             : $"JAVA_HOME actual:\n{value}");
     }
 
@@ -181,20 +165,25 @@ class Program
 
     // ---------------- CORE ----------------
 
-    static (string Name, string Path, Version Version)[] GetJdks(string dir)
+    static Jdk[] LoadJdks(string dir)
     {
         return Directory.GetDirectories(dir)
             .Select(d =>
             {
                 string name = Path.GetFileName(d);
-                return (name, d, ParseVersion(name));
+                return new Jdk
+                {
+                    Name = name,
+                    Path = d,
+                    Version = ParseVersion(name)
+                };
             })
             .ToArray();
     }
 
-    static Version ParseVersion(string folderName)
+    static Version ParseVersion(string name)
     {
-        var match = Regex.Match(folderName, @"(\d+)(\.\d+)?(\.\d+)?");
+        var match = Regex.Match(name, @"(\d+)(\.\d+)?(\.\d+)?");
 
         if (!match.Success)
             return new Version(0, 0);
