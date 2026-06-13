@@ -15,7 +15,7 @@ sjvs es una herramienta CLI ligera para gestionar y cambiar versiones de JDK en 
 
 ## Instalación
 
-Descargamos la última release y la ubicamos en una ubicación de nuestra conveniencia (p.e. C:\Tools\sjvs)
+Descargamos la última release y la ubicamos en una ubicación de nuestra conveniencia (p.e. C:\Tools\sjvs). Posteriormente, añadimos la ruta a la variable de entorno PATH
 
 ## Uso
 

@@ -15,7 +15,7 @@ class Program
 
         if (args.Length == 0)
         {
-            PrintHelp();
+            PrintWelcome();
             return;
         }
 
@@ -183,7 +183,7 @@ class Program
         Console.WriteLine(value);
     }
 
-    static void PrintHelp()
+    static void PrintWelcome()
     {
         Console.WriteLine("NAME:");
         Console.WriteLine($"   sjvs - JDK Version Manager for Windows - {GetVersion()}");
@@ -192,16 +192,20 @@ class Program
         Console.WriteLine("   sjvs.exe [global options] command [command options] [arguments...]");
         Console.WriteLine();
         Console.WriteLine();
+        Console.WriteLine("GLOBAL OPTIONS:");
+        Console.WriteLine("   --help, -h     Show help");
+        Console.WriteLine("   --version, -v  Print the version");
+    }
+
+
+    static void PrintHelp()
+    {
         Console.WriteLine("COMMANDS:");
         Console.WriteLine("     dir              Configure the JDK directory");
         Console.WriteLine("     list             List available JDK installations");
-        Console.WriteLine("     use              Switch to use the specified version");
+        Console.WriteLine("     use              Switch to use the specified version. Can be a full version, partial version, or 'latest', to search for the latest version available.");
         Console.WriteLine("     current          Show the current JAVA_HOME");
-        Console.WriteLine("     help, h          Shows a list of commands or help for one command");
         Console.WriteLine();
-        Console.WriteLine("GLOBAL OPTIONS:");
-        Console.WriteLine("   --help, -h     show help");
-        Console.WriteLine("   --version, -v  print the version");
     }
 
     // ================ CORE ================
