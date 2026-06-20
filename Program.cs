@@ -187,7 +187,7 @@ class Program
     static void PrintWelcome()
     {
         Console.WriteLine("NAME:");
-        Console.WriteLine($"   sjvs - JDK Version Manager for Windows - {GetVersion()}");
+        Console.WriteLine($"   sjvs - Simple Java Version Switcher - {GetVersion()}");
         Console.WriteLine();
         Console.WriteLine("USAGE:");
         Console.WriteLine("   sjvs.exe [global options] command [command options] [arguments...]");
